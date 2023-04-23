@@ -69,13 +69,13 @@ import requests
 
 prefix = 'https://atlas.ripe.net/api/v2/'
 
-def get_starlink_ids():
-    tags = 'starlink'
-    status = 'Connected'
-    is_public = True
+def get_starlink_probe_ids():
+    params = dict()
+    params['tags'] = 'starlink'
+    params['status_name'] = 'Connected'
+    params['is_public'] = True
 
-    r = requests.get(prefix + 'probes/?tags=' + tags + '&is_public=' + str(is_public) + '&status_name=' + status)
-
+    r = requests.get(prefix + 'probes/', params=params)
     j = r.json()
 
     ids = []
@@ -84,5 +84,11 @@ def get_starlink_ids():
         ids.append(res['id'])
     return ids
 
-print(get_starlink_ids())
+def main():
+    starlink__probe_ids = get_starlink_probe_ids()
+    num_starlink_probes = len(starlink__probe_ids)
 
+    print(str(num_starlink_probes) + " Probes \nProbe IDs:")
+    print(starlink__probe_ids)
+
+main()
