@@ -67,14 +67,14 @@ This is chatgpt Code: DO NOT TRUST
 '''
 import requests
 
-prefix = 'https://atlas.ripe.net'
+prefix = 'https://atlas.ripe.net/api/v2/'
 
 def get_starlink_ids():
     tags = 'starlink'
     status = 'Connected'
     is_public = True
 
-    r = requests.get(prefix + '/api/v2/probes/?tags=' + tags + '&is_public=' + str(is_public) + '&status_name=' + status)
+    r = requests.get(prefix + 'probes/?tags=' + tags + '&is_public=' + str(is_public) + '&status_name=' + status)
 
     j = r.json()
 
