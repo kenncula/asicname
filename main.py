@@ -66,3 +66,19 @@ ping_times = [result["result"]["rtt"] for result in ping_results]
 
 This is chatgpt Code: DO NOT TRUST
 '''
+import requests
+
+prefix = 'https://atlas.ripe.net'
+tags = 'starlink'
+is_public = True
+
+r = requests.get(prefix + '/api/v2/probes/?tags=' + tags + '&is_public=' + str(is_public))
+
+j = r.json()
+
+ids = []
+
+for res in j['results']:
+    ids.append(res['id'])
+
+print(ids)
