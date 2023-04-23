@@ -1,4 +1,3 @@
-print("Hello World")
 '''
 ripe.atlas.cousteau library: 
 This is a Python library provided by RIPE Atlas that provides a convenient 
@@ -69,16 +68,21 @@ This is chatgpt Code: DO NOT TRUST
 import requests
 
 prefix = 'https://atlas.ripe.net'
-tags = 'starlink'
-is_public = True
 
-r = requests.get(prefix + '/api/v2/probes/?tags=' + tags + '&is_public=' + str(is_public))
+def get_starlink_ids():
+    tags = 'starlink'
+    status = 'Connected'
+    is_public = True
 
-j = r.json()
+    r = requests.get(prefix + '/api/v2/probes/?tags=' + tags + '&is_public=' + str(is_public) + '&status_name=' + status)
 
-ids = []
+    j = r.json()
 
-for res in j['results']:
-    ids.append(res['id'])
+    ids = []
 
-print(ids)
+    for res in j['results']:
+        ids.append(res['id'])
+    return ids
+
+print(get_starlink_ids())
+
