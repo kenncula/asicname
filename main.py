@@ -66,30 +66,23 @@ ping_times = [result["result"]["rtt"] for result in ping_results]
 This is chatgpt Code: DO NOT TRUST
 '''
 import requests
-from ripe.atlas.sagan import PingResult, SslResult
 
+prefix = 'https://atlas.ripe.net/api/v2/'
 
-my_result = PingResult('this is where your big JSON blob goes')
+def get_starlink_ids():
+    tags = 'starlink'
+    status = 'Connected'
+    is_public = True
 
-my_result.rtt_average
-my_result.rtt_median
-# Returns 123.456
+    r = requests.get(prefix + 'probes/?tags=' + tags + '&is_public=' + str(is_public) + '&status_name=' + status)
 
+    j = r.json()
 
- 
+    ids = []
 
+    for res in j['results']:
+        ids.append(res['id'])
+    return ids
 
-source = "https://atlas.ripe.net/api/v1/measurement-latest/1012449/"
-response = requests.get(source).json
+print(get_starlink_ids())
 
-for probe_id, result in response.items():
-
-    result = result[0]                 # There's only one result for each probe
-    parsed_result = SslResult(result)  # Parsing magic!
-
-    # Each SslResult has n certificates
-    for certificate in parsed_result.certificates:
-        print(certificate.checksum)  # Print the checksum for this certificate
-
-    # Make use of the handy get_checksum_chain() to render the checksum of each certificate into one string if you want
-    print(parsed_result.get_checksum_chain())
