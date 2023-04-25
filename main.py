@@ -93,8 +93,8 @@ ping = Ping(
     af=4,
     target="google.com",
     description="Ping Test",
-    #interval=900,
-    is_oneoff=True
+    #interval=900, #this sets the interval to ping every 15 minutes
+    is_oneoff=True #this is for testing,
 )
 str_ids=str(starlink_ids)
 table=str_ids.maketrans('','',' []')
