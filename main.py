@@ -85,7 +85,6 @@ def get_starlink_ids():
     return ids
 
 starlink_ids=get_starlink_ids()
-print(starlink_ids)
 
 from ripe.atlas.cousteau import Ping
 from ripe.atlas.cousteau import AtlasSource
@@ -97,11 +96,14 @@ ping = Ping(
     #interval=900,
     is_oneoff=True
 )
+str_ids=str(starlink_ids)
+table=str_ids.maketrans('','',' []')
+trans_ids=str_ids.translate(table)
 
 source = AtlasSource(
     type="probes",
-    value="19983",
-    requested=1
+    value=trans_ids,
+    requested=len(starlink_ids)
 )
 
 from datetime import datetime
@@ -119,32 +121,19 @@ atlas_request = AtlasCreateRequest(
     is_oneoff=True
 )
 
-
 import re
 (is_success, response) = atlas_request.create()
 id=re.sub("[^0-9]", "", str(response))
-print(id)
-print(is_success)
-print(response)
+print("msm_id:" + id)
 
-
-from ripe.atlas.cousteau import AtlasResultsRequest
+from ripe.atlas.cousteau import AtlasLatestRequest
 
 kwargs = {
     "msm_id": id,
-    "start": datetime(2023, 4, 25),
-    "stop": datetime(2023, 4, 26),
-    "probe_ids": "19983"
+    "probe_ids": trans_ids
 }
 
-res_success, results = AtlasResultsRequest(**kwargs).create()
-
-from ripe.atlas.sagan import PingResult
-
-my_result = PingResult(results)
-
-
-print(my_result.rtt_median)
+res_success, results = AtlasLatestRequest(**kwargs).create()
 
 if res_success:
     print(results)
