@@ -66,8 +66,19 @@ ping_times = [result["result"]["rtt"] for result in ping_results]
 This is chatgpt Code: DO NOT TRUST
 '''
 import requests
+from plot_ping import generate_plots
+from datetime import datetime, tzinfo
 
 prefix = 'https://atlas.ripe.net/api/v2/'
+
+HOURS_IN_DAY = 24
+MIN_IN_HOUR = 60
+
+DAYS_OF_REQUESTS = 1
+
+MIN_BETWEEN_REQUESTS = 15
+S_BETWEEN_REQUESTS = MIN_BETWEEN_REQUESTS * 60
+MS_BETWEEN_REQUESTS = S_BETWEEN_REQUESTS * 1000
 
 def get_starlink_probe_ids():
     params = dict()
@@ -137,12 +148,19 @@ res_success, results = AtlasLatestRequest(**kwargs).create()
 
 if res_success:
     print(results)
+def generate_fake_time_data(num_probes,start_time):
+    print("GENERATING FAKE TIME DATA")
+    datetime().now(tz=tzinfo(0))
+
+def generate_fake_latency_data(num_probes,start_time):
+    print("GENERATING FAKE LATENCY DATA")
 
 def main():
     starlink__probe_ids = get_starlink_probe_ids()
     num_starlink_probes = len(starlink__probe_ids)
 
-    print(str(num_starlink_probes) + " Probes \nProbe IDs:")
-    print(starlink__probe_ids)
+    fake_time_data = generate_fake_time_data(num_starlink_probes, 0)
+    fake_latency_data = generate_fake_latency_data(num_starlink_probes, 0)
+    generate_plots(range(1,6), [12.4,6.2,5.3,4.1,8.0])
 
 main()
