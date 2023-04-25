@@ -84,5 +84,67 @@ def get_starlink_ids():
         ids.append(res['id'])
     return ids
 
-print(get_starlink_ids())
+starlink_ids=get_starlink_ids()
+print(starlink_ids)
 
+from ripe.atlas.cousteau import Ping
+from ripe.atlas.cousteau import AtlasSource
+
+ping = Ping(
+    af=4,
+    target="google.com",
+    description="Ping Test",
+    #interval=900,
+    is_oneoff=True
+)
+
+source = AtlasSource(
+    type="probes",
+    value="19983",
+    requested=1
+)
+
+from datetime import datetime
+from ripe.atlas.cousteau import (
+  AtlasSource,
+  AtlasCreateRequest
+)
+
+ATLAS_API_KEY = "9b60b650-68bf-4c40-bbcc-a2b8d3e15779"
+
+atlas_request = AtlasCreateRequest(
+    key=ATLAS_API_KEY,
+    measurements=[ping],
+    sources=[source],
+    is_oneoff=True
+)
+
+
+import re
+(is_success, response) = atlas_request.create()
+id=re.sub("[^0-9]", "", str(response))
+print(id)
+print(is_success)
+print(response)
+
+
+from ripe.atlas.cousteau import AtlasResultsRequest
+
+kwargs = {
+    "msm_id": id,
+    "start": datetime(2023, 4, 25),
+    "stop": datetime(2023, 4, 26),
+    "probe_ids": "19983"
+}
+
+res_success, results = AtlasResultsRequest(**kwargs).create()
+
+from ripe.atlas.sagan import PingResult
+
+my_result = PingResult(results)
+
+
+print(my_result.rtt_median)
+
+if res_success:
+    print(results)
