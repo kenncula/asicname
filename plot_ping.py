@@ -14,9 +14,9 @@ def generate_plots(data):
     y_calculations = zipped_data[1]
     plt.plot(x_calculations,y_calculations, label='Starlink Probe #'+str(i))
   
-  plt.xlabel("time (UTC)")
-  plt.ylabel("latency (s)")
-  plt.title("Latency Over Time for RIPE Atlas Starlink Probes")
+  plt.xlabel("Time (UTC)")
+  plt.ylabel("Ping Latency (seconds)")
+  plt.title("Ping Latency Over Time for RIPE Atlas Starlink Probes")
   f.legend(loc='upper right')
   plt.savefig('./plots/ping_plots/starlink_plots' + datetime.now().isoformat()+'.png')
   
