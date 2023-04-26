@@ -69,6 +69,7 @@ import requests
 from plot_ping import generate_plots
 from datetime import datetime, tzinfo,timedelta
 import random
+from read_json import json_to_graph
 
 prefix = 'https://atlas.ripe.net/api/v2/'
 
@@ -81,7 +82,7 @@ MIN_BETWEEN_REQUESTS = 15
 S_BETWEEN_REQUESTS = MIN_BETWEEN_REQUESTS * 60
 MS_BETWEEN_REQUESTS = S_BETWEEN_REQUESTS * 1000
 
-TEST_GRAPHING = True
+TEST_GRAPHING = False
 
 def get_starlink_probe_ids():
     params = dict()
@@ -128,6 +129,8 @@ def main():
     print(starlink_probe_ids)
     if TEST_GRAPHING:
         test_plots_with_fake_data(num_starlink_probes)
+    data = json_to_graph('example.json')
+    generate_plots(data)
     
 
 main()

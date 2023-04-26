@@ -1,23 +1,28 @@
-import matplotlib.pyplot as plt
 import matplotlib.dates as dates
-import numpy
 from datetime import datetime
+import plotly.graph_objects as go
+
 
 
 def generate_plots(data):
-  f = plt.figure(figsize=(27.6667,15.1111))
-  i = 0
-  for d in data:
-    i += 1
-    zipped_data = [list(a) for a in zip(*d)]
+  fig = go.Figure()
+  
+  for key,value in data:
+    zipped_data = [list(a) for a in zip(*value)]
     x_calculations = zipped_data[0]
     y_calculations = zipped_data[1]
-    plt.plot(x_calculations,y_calculations, label='Starlink Probe #'+str(i))
-  
-  plt.xlabel("Time (UTC)")
-  plt.ylabel("Ping Latency (seconds)")
-  plt.title("Ping Latency Over Time for RIPE Atlas Starlink Probes")
-  f.legend(loc='upper right')
-  plt.savefig('./plots/ping_plots/starlink_plots' + datetime.now().isoformat()+'.png')
-  
+
+    fig.add_trace(go.Scatter(x=x_calculations,y=y_calculations, name='Probe #'+str(key), mode='lines+markers'))
+
+  fig.update_layout(
+    title="Latency Over Time of RIPE Atlas Probes",
+    xaxis_title="Time (UTC)",
+    yaxis_title="Latency",
+    font=dict(
+      family="Courier New, monospace",
+      size=18,
+      color="Blue"
+    )
+  )
+  fig.show()
 
