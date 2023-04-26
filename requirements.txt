@@ -2,3 +2,5 @@ requests
 matplotlib
 numpy
 datetime
+plotly
+pandas
