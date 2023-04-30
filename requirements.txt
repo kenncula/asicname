@@ -5,3 +5,5 @@ datetime
 plotly
 pandas
 dash-bootstrap-components
+emoji-country-flag
+pycountry
