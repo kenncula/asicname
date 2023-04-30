@@ -65,10 +65,11 @@ ping_times = [result["result"]["rtt"] for result in ping_results]
 This is chatgpt Code: DO NOT TRUST
 '''
 import requests
-from plot_ping import generate_plots
+from plot_ping import generate_plots, geo_plot
 from datetime import datetime, tzinfo, timedelta
 import random
 from read_json import json_to_graph
+import json
 
 prefix = 'https://atlas.ripe.net/api/v2/'
 
@@ -82,11 +83,16 @@ S_BETWEEN_REQUESTS = MIN_BETWEEN_REQUESTS * 60
 MS_BETWEEN_REQUESTS = S_BETWEEN_REQUESTS * 1000
 
 TEST_GRAPHING = False
+ID_LIST = [
+    61537, 60929, 61113, 60510, 52955, 52918, 1004453, 1005627, 26834, 1004876,
+    1002827, 1002750, 35681, 17979, 20544
+]
 
 
 def get_starlink_probe_ids():
     params = dict()
-    params['tags'] = 'starlink'
+    #params['tags'] = 'starlink'
+    params['asn'] = 14593
     params['status_name'] = 'Connected'
     params['is_public'] = True
 
@@ -98,6 +104,40 @@ def get_starlink_probe_ids():
     for res in j['results']:
         ids.append(res['id'])
     return ids
+
+
+def get_coords(ids):
+    """
+    Helper function
+    Given a list of probe ids, we return a dictionary that maps the ids to some 
+    (latitute, longitude) tuple
+    Yes geoJSON flips them (long, lat). I think that's BS so I'm re-flipping them. 
+    So it's the correct way.
+    The only way.
+    """
+    ids_to_str = str(ids)[1:-1]
+    r = requests.get(prefix + 'probes?id__in=' + ids_to_str)
+    j = r.json()
+
+    position = {}
+
+    # print("j is " + repr(j))
+    for res in j['results']:
+        key = res['id']
+        geometry = res['geometry']['coordinates']
+        loc = (geometry[1], geometry[0])
+        position[key] = loc
+    return position
+
+
+def update_json(msm, save_locally=True, save_path='measurements.json'):
+    # 52793844
+    r = requests.get(prefix + 'measurements/' + str(msm) + '/results')
+    data = r.json()
+    if save_locally:
+        with open(save_path, 'w') as f:
+            json.dump(data, f)
+    return data
 
 
 def generate_fake_time_data(start_time):
@@ -132,14 +172,19 @@ def test_plots_with_fake_data(num_probes):
 
 
 def main():
-    starlink_probe_ids = get_starlink_probe_ids()
+    #starlink_probe_ids = get_starlink_probe_ids()
+    starlink_probe_ids = ID_LIST
+    coordinates = get_coords(starlink_probe_ids)
     num_starlink_probes = len(starlink_probe_ids)
     print("Starlink Probe IDs for " + str(num_starlink_probes) + " Probes:")
     print(starlink_probe_ids)
     if TEST_GRAPHING:
         test_plots_with_fake_data(num_starlink_probes)
-    data = json_to_graph('example.json')
+
+    update_json(52793844)
+    data = json_to_graph('measurements.json')
     generate_plots(data)
+    geo_plot(data, coordinates)
 
 
 main()
