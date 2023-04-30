@@ -38,12 +38,25 @@ def json_to_graph(j):
     #we create a dict so we can index by probe id and consolidate data
 
     json_obj = j
-    probe_dict = {}
+    probe_dict_avg = {}
+    probe_dict_min = {}
+    probe_dict_max = {}
     for probe in json_obj:
         idx = probe["prb_id"]
-        data = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["avg"])
+        data_avg = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["avg"])
+        data_min = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["min"])
+        data_max = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["max"])
         try:
-          probe_dict[idx].append(data)
+          probe_dict_avg[idx].append(data_avg)
         except:
-              probe_dict[idx] = [data]
-    return probe_dict
+              probe_dict_avg[idx] = [data_avg]
+        try:
+          probe_dict_min[idx].append(data_min)
+        except:
+              probe_dict_min[idx] = [data_min]
+        try:
+          probe_dict_max[idx].append(data_max)
+        except:
+              probe_dict_max[idx] = [data_max]
+    probe_dicts = (probe_dict_avg, probe_dict_min, probe_dict_max)
+    return probe_dicts
