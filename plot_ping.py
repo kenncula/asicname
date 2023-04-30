@@ -8,9 +8,6 @@ import pycountry
 
 prefix = 'https://atlas.ripe.net/api/v2/'
 
-
-
-
 def generate_plots(data):
   fig = go.Figure()
   sorted_data = {key:data[key] for key in sorted(data.keys())}

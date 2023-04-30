@@ -7,3 +7,8 @@ pandas
 dash-bootstrap-components
 emoji-country-flag
 pycountry
+ripe
+ripe.atlas.cousteau
+prettytable
+node
+tzdata

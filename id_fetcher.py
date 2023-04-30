@@ -1,3 +1,8 @@
+import requests
+import json
+
+prefix = 'https://atlas.ripe.net/api/v2/'
+
 def get_starlink_probe_ids():
     params = dict()
     params['tags'] = 'starlink'
