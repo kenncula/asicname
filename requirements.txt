@@ -1,1 +1,11 @@
-requests
+Probe List: 61537,60929,61113,60510,52955,52918,1004453,1005627,26834,1004876,1002827,1002750,35681,17979,20544
+NA (4)
+61537 (USA East Coast), 60929 (USA West Coast), 61113 (USA Alaska), 60510 (Canada)
+Australia (3)
+52955 (New Zealand), 52918 (Australia West Coast), 1004453 (Australia East Coast)
+Carribean (1)
+1005627 (Haiti)
+SA (1)
+26834 (Chile)
+Europe (5)
+1004876 (Italy), 1002827 (France), 1002750 (Germany), 35681 (Austria), 17979 (UK), 20544 (Poland)
