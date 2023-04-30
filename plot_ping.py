@@ -34,7 +34,7 @@ def make_figure(data, probes, latency_type):
         name='Probe #'+str(key), 
         mode='lines+markers', 
         hovertemplate=
-        '<b>Latency</b>: %{y:.2f} ms'+
+        '<b>' + latency_type.capitalize()+' Latency</b>: %{y:.2f} ms'+
         '<br><b>Time</b>: %{x} UTC<br>'+
         '%{text}<extra></extra>',
         text = ['<b>Probe ID</b>: ' + str(probe['id']) + '<br><b>Description</b>: ' + str(probe['description']) + '<br><b>Country</b>: '+ pycountry.countries.get(alpha_2=probe['country_code']).name + ' ' + str(flag.flag(probe['country_code'])) + "<br> <b>CLICK POINT FOR MORE INFO</b>" for i in range(l)],
