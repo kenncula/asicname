@@ -49,23 +49,23 @@ color_map = {country: colors[color] for country, color in country_map.items()}
 
 msm_id = 52793844
 
-
 # TELL THE SCRIPT WHAT TO RUN HERE
 FETCH_IDS = False
 PING_GOOGLE = False
 TEST_GRAPHING = False
-GENERATE_PLOT = False
-GENERATE_MAP = False
+GENERATE_PLOT = True
+GENERATE_MAP = True
+
 
 def get_coords(ids):
     """
-    Helper function
-    Given a list of probe ids, we return a dictionary that maps the ids to some 
-    (latitute, longitude, countrycode) tuple
-    Yes geoJSON flips them (long, lat). I think that's BS so I'm re-flipping them. 
-    So it's the correct way.
-    The only way.
-    """
+		Helper function
+		Given a list of probe ids, we return a dictionary that maps the ids to some 
+		(latitute, longitude, countrycode) tuple
+		Yes geoJSON flips them (long, lat). I think that's BS so I'm re-flipping them. 
+		So it's the correct way.
+		The only way.
+		"""
     ids_to_str = str(ids)[1:-1]
     r = requests.get(prefix + 'probes?id__in=' + ids_to_str)
     j = r.json()
@@ -81,27 +81,32 @@ def get_coords(ids):
         position[key] = loc
     return position
 
+
 def main():
     if FETCH_IDS or PING_GOOGLE or TEST_GRAPHING or GENERATE_MAP:
-        coordinates = get_coords(starlink_probe_ids)
         #starlink_probe_ids = get_starlink_probe_ids()
         starlink_probe_ids = ID_LIST
+        coordinates = get_coords(starlink_probe_ids)
+
         #if you want to include the backup
         num_starlink_probes = len(starlink_probe_ids)
-        print("Found " + str(num_starlink_probes) + " Starlink probes with IDs:\n")
+        print("Found " + str(num_starlink_probes) +
+              " Starlink probes with IDs:\n")
         print(starlink_probe_ids)
     if PING_GOOGLE:
         ping_google(starlink_probe_ids)
     if TEST_GRAPHING:
         test_plots_with_fake_data(num_starlink_probes)
     if GENERATE_PLOT:
-        r = requests.get(prefix + 'measurements/'+ str(msm_id) + '/results')
+        r = requests.get(prefix + 'measurements/' + str(msm_id) + '/results')
         j = r.json()
         data = json_to_graph(j)
         generate_plots(data)
     if GENERATE_MAP:
-        r = requests.get(prefix + 'measurements/'+ str(msm_id) + '/results')
+        r = requests.get(prefix + 'measurements/' + str(msm_id) + '/results')
         j = r.json()
         data_time_sort = json_to_time(j)
         geo_plot(data_time_sort, coordinates)
+
+
 main()

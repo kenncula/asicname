@@ -1,6 +1,8 @@
 import json
 import tzdata
 from datetime import datetime, timedelta, timezone
+import pandas as pd
+
 
 def json_to_graph(j):
     """
@@ -42,25 +44,32 @@ def json_to_graph(j):
     probe_dict_max = {}
     for probe in json_obj:
         idx = probe["prb_id"]
-        data_avg = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["avg"])
-        data_min = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["min"])
-        data_max = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["max"])
+        data_avg = (datetime.fromtimestamp(probe["timestamp"],
+                                           tz=timezone(timedelta(0, 0))),
+                    probe["avg"])
+        data_min = (datetime.fromtimestamp(probe["timestamp"],
+                                           tz=timezone(timedelta(0, 0))),
+                    probe["min"])
+        data_max = (datetime.fromtimestamp(probe["timestamp"],
+                                           tz=timezone(timedelta(0, 0))),
+                    probe["max"])
         try:
-          probe_dict_avg[idx].append(data_avg)
+            probe_dict_avg[idx].append(data_avg)
         except:
-              probe_dict_avg[idx] = [data_avg]
+            probe_dict_avg[idx] = [data_avg]
         try:
-          probe_dict_min[idx].append(data_min)
+            probe_dict_min[idx].append(data_min)
         except:
-              probe_dict_min[idx] = [data_min]
+            probe_dict_min[idx] = [data_min]
         try:
-          probe_dict_max[idx].append(data_max)
+            probe_dict_max[idx].append(data_max)
         except:
-              probe_dict_max[idx] = [data_max]
+            probe_dict_max[idx] = [data_max]
     probe_dicts = (probe_dict_avg, probe_dict_min, probe_dict_max)
     return probe_dicts
 
-def json_to_time(path):
+
+def json_to_time(j):
     """
     json : a list of dictionaries
       dict{
@@ -94,23 +103,24 @@ def json_to_time(path):
       }
     """
     #we create a dict so we can index by probe id and consolidate data
-    with open(path) as user_file:
-        file_contents = user_file.read()
-        json_obj = json.loads(file_contents)
-        time_dict = {}
-        for probe in json_obj:
-            time = datetime.fromtimestamp(probe["timestamp"],
-                                          tz=timezone(timedelta(0, 0)))
-            idx = datetime(year=time.year,
-                           month=time.month,
-                           day=time.day,
-                           hour=time.hour,
-                           minute=time.minute - time.minute % 15,
-                           second=0,
-                           microsecond=0)
-            data = (probe["prb_id"], probe["avg"])
-            try:
-                time_dict[idx].append(data)
-            except:
-                time_dict[idx] = [data]
-        return time_dict.items()
+    # with open(path) as user_file:
+    #     file_contents = user_file.read()
+    #     json_obj = json.loads(file_contents)
+    json_obj = j
+    time_dict = {}
+    for probe in json_obj:
+        time = datetime.fromtimestamp(probe["timestamp"],
+                                      tz=timezone(timedelta(0, 0)))
+        idx = datetime(year=time.year,
+                       month=time.month,
+                       day=time.day,
+                       hour=time.hour,
+                       minute=time.minute - time.minute % 15,
+                       second=0,
+                       microsecond=0)
+        data = (probe["prb_id"], probe["avg"])
+        try:
+            time_dict[idx].append(data)
+        except:
+            time_dict[idx] = [data]
+    return time_dict.items()
