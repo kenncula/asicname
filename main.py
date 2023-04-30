@@ -6,15 +6,15 @@ from fake_data import test_plots_with_fake_data
 from ping_sites import ping_google
 
 prefix = 'https://atlas.ripe.net/api/v2/'
-
 msm_id = 52793844
 
 
-#TELL THE SCRIPT WHAT TO RUN
+# TELL THE SCRIPT WHAT TO RUN HERE
 FETCH_IDS = False
 PING_GOOGLE = False
 TEST_GRAPHING = False
-GENERATE_PLOT = True
+GENERATE_PLOT = False
+
 
 
 def main():
