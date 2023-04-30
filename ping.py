@@ -1,9 +1,8 @@
 from ripe.atlas.cousteau import Ping
 from ripe.atlas.cousteau import AtlasSource
+from ripe.atlas.cousteau import AtlasStream
 
 msm_id = 12345
-
-from ripe.atlas.cousteau import AtlasStream
 
 def on_result_response(*args):
     """
