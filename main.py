@@ -1,75 +1,10 @@
-'''
-ripe.atlas.cousteau library: 
-This is a Python library provided by RIPE Atlas that provides a convenient 
-interface for working with the RIPE Atlas API. You can use it to set up and 
-execute ping measurements, and retrieve the results.
-
-MeasurementRequest() method: 
-This method allows you to create a new measurement request, which you can 
-use to define the parameters of the ping measurement you want to perform. 
-You can specify the target IP address or hostname, the number of packets 
-to send, the interval between packets, and other parameters.
-
-AtlasSource() method: 
-This method allows you to specify the source of the ping measurement. 
-You can specify a single RIPE Atlas probe, a set of probes, or a group of probes.
-
-AtlasCreateRequest() method: 
-This method allows you to create a new measurement request using the 
-parameters you have specified.
-
-AtlasResultsRequest() method: 
-This method allows you to retrieve the results of a measurement request. 
-You can use it to get the ping times for each packet, as well as other 
-information such as the number of packets lost.'''
-'''
-from ripe.atlas.cousteau import AtlasSource, AtlasCreateRequest, AtlasResultsRequest
-
-# Set up the measurement parameters
-ping_count = 10
-target_address = "example.com"
-
-# Set up the source of the measurement
-atlas_source = AtlasSource(type="probes", value="US")
-
-# Create the measurement request
-ping_request = AtlasCreateRequest(
-    start_time=None,
-    key=None,
-    measurements=[{
-        "type": "ping",
-        "af": 4,
-        "target": target_address,
-        "description": "Ping measurement",
-        "interval": 300,
-        "packets": ping_count,
-    }],
-    sources=[atlas_source],
-    is_oneoff=True
-)
-
-# Submit the measurement request and get the measurement ID
-ping_response = ping_request.create()
-measurement_id = ping_response["measurements"][0]
-
-# Wait for the measurement to complete
-while True:
-    is_completed = AtlasResultsRequest(msm_id=measurement_id).create().is_success()
-    if is_completed:
-        break
-
-# Get the results of the measurement
-ping_results = AtlasResultsRequest(msm_id=measurement_id).create()
-ping_times = [result["result"]["rtt"] for result in ping_results]
-
-This is chatgpt Code: DO NOT TRUST
-'''
 import requests
 from plot_ping import generate_plots, geo_plot
-from datetime import datetime, tzinfo, timedelta
-import random
 from read_json import json_to_graph, json_to_time
-import json
+from id_fetcher import get_starlink_probe_ids
+from fake_data import test_plots_with_fake_data
+from ping_sites import ping_google
+from datetime import datetime, tzinfo, timedelta
 
 prefix = 'https://atlas.ripe.net/api/v2/'
 
@@ -112,23 +47,15 @@ country_map = {
 # Map each country to a color
 color_map = {country: colors[color] for country, color in country_map.items()}
 
+msm_id = 52793844
 
-def get_starlink_probe_ids():
-    params = dict()
-    #params['tags'] = 'starlink'
-    params['asn'] = 14593
-    params['status_name'] = 'Connected'
-    params['is_public'] = True
 
-    r = requests.get(prefix + 'probes/', params=params)
-    j = r.json()
-
-    ids = []
-
-    for res in j['results']:
-        ids.append(res['id'])
-    return ids
-
+# TELL THE SCRIPT WHAT TO RUN HERE
+FETCH_IDS = False
+PING_GOOGLE = False
+TEST_GRAPHING = False
+GENERATE_PLOT = False
+GENERATE_MAP = False
 
 def get_coords(ids):
     """
@@ -154,64 +81,27 @@ def get_coords(ids):
         position[key] = loc
     return position
 
-
-def update_json(msm, save_locally=True, save_path='measurements.json'):
-    # 52793844
-    r = requests.get(prefix + 'measurements/' + str(msm) + '/results')
-    data = r.json()
-    if save_locally:
-        with open(save_path, 'w') as f:
-            json.dump(data, f)
-    return data
-
-
-def generate_fake_time_data(start_time):
-    times = []
-    d = datetime.now()
-    for j in range(
-            start_time, start_time +
-        (int)(HOURS_IN_DAY * MIN_IN_HOUR / MIN_BETWEEN_REQUESTS)):
-        times.append(
-            datetime(d.year, d.month, d.day) + timedelta(0, 0, 0, 0, (15 * j)))
-    return times
-
-
-def generate_fake_latency_data(start_time):
-    data = []
-    for j in range(
-            start_time, start_time +
-        (int)(HOURS_IN_DAY * MIN_IN_HOUR / MIN_BETWEEN_REQUESTS)):
-        data.append(random.randint(0, 200))
-    return data
-
-
-def test_plots_with_fake_data(num_probes):
-    data = []
-    for i in range(num_probes):
-        fake_time_data = generate_fake_time_data(0)
-        fake_latency_data = generate_fake_latency_data(0)
-        d = [(fake_time_data[i], fake_latency_data[i])
-             for i in range(0, len(fake_time_data))]
-        data.append(d)
-    generate_plots(data)
-
-
 def main():
-    #starlink_probe_ids = get_starlink_probe_ids()
-    starlink_probe_ids = ID_LIST
-    coordinates = get_coords(starlink_probe_ids)
-    num_starlink_probes = len(starlink_probe_ids)
-    print("Starlink Probe IDs for " + str(num_starlink_probes) + " Probes:")
-    print(starlink_probe_ids)
+    if FETCH_IDS or PING_GOOGLE or TEST_GRAPHING or GENERATE_MAP:
+        coordinates = get_coords(starlink_probe_ids)
+        #starlink_probe_ids = get_starlink_probe_ids()
+        starlink_probe_ids = ID_LIST
+        #if you want to include the backup
+        num_starlink_probes = len(starlink_probe_ids)
+        print("Found " + str(num_starlink_probes) + " Starlink probes with IDs:\n")
+        print(starlink_probe_ids)
+    if PING_GOOGLE:
+        ping_google(starlink_probe_ids)
     if TEST_GRAPHING:
         test_plots_with_fake_data(num_starlink_probes)
-
-    update_json(52793844)
-    data = json_to_graph('measurements.json')
-    data_time_sort = json_to_time('measurements.json')
-
-    generate_plots(data, coordinates, color_map)
-    geo_plot(data_time_sort, coordinates)
-
-
+    if GENERATE_PLOT:
+        r = requests.get(prefix + 'measurements/'+ str(msm_id) + '/results')
+        j = r.json()
+        data = json_to_graph(j)
+        generate_plots(data)
+    if GENERATE_MAP:
+        r = requests.get(prefix + 'measurements/'+ str(msm_id) + '/results')
+        j = r.json()
+        data_time_sort = json_to_time(j)
+        geo_plot(data_time_sort, coordinates)
 main()

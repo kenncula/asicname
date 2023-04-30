@@ -2,8 +2,7 @@ import json
 import tzdata
 from datetime import datetime, timedelta, timezone
 
-
-def json_to_graph(path):
+def json_to_graph(j):
     """
     json : a list of dictionaries
       dict{
@@ -37,21 +36,29 @@ def json_to_graph(path):
       }
     """
     #we create a dict so we can index by probe id and consolidate data
-    with open(path) as user_file:
-        file_contents = user_file.read()
-        json_obj = json.loads(file_contents)
-        probe_dict = {}
-        for probe in json_obj:
-            idx = probe["prb_id"]
-            data = (datetime.fromtimestamp(probe["timestamp"],
-                                           tz=timezone(timedelta(0, 0))),
-                    probe["avg"])
-            try:
-                probe_dict[idx].append(data)
-            except:
-                probe_dict[idx] = [data]
-        return probe_dict.items()
-
+    json_obj = j
+    probe_dict_avg = {}
+    probe_dict_min = {}
+    probe_dict_max = {}
+    for probe in json_obj:
+        idx = probe["prb_id"]
+        data_avg = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["avg"])
+        data_min = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["min"])
+        data_max = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["max"])
+        try:
+          probe_dict_avg[idx].append(data_avg)
+        except:
+              probe_dict_avg[idx] = [data_avg]
+        try:
+          probe_dict_min[idx].append(data_min)
+        except:
+              probe_dict_min[idx] = [data_min]
+        try:
+          probe_dict_max[idx].append(data_max)
+        except:
+              probe_dict_max[idx] = [data_max]
+    probe_dicts = (probe_dict_avg, probe_dict_min, probe_dict_max)
+    return probe_dicts
 
 def json_to_time(path):
     """
