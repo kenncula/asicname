@@ -47,6 +47,7 @@ def geo_plot(data, geo_lookup, animate=True):
     latency = {}
 
     start_index = 0
+
     for key, value in data:
         zipped_data = [list(a) for a in zip(*value)]
         #some sort of location look-up
@@ -76,6 +77,7 @@ def geo_plot(data, geo_lookup, animate=True):
             latency[dict_idx] = y_calculations[i]
         start_index = len(y_calculations) + start_index
     #should I populate the time frames with
+
     df = pd.DataFrame({
         'time': time,
         'probe': probe,
@@ -83,6 +85,7 @@ def geo_plot(data, geo_lookup, animate=True):
         'lon': lon,
         'latency': latency
     })
+    print(df)
     if animate:
         fig = px.scatter_mapbox(df,
                                 hover_name=df['probe'],

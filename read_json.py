@@ -92,8 +92,15 @@ def json_to_time(path):
         json_obj = json.loads(file_contents)
         time_dict = {}
         for probe in json_obj:
-            idx = datetime.fromtimestamp(probe["timestamp"],
-                                         tz=timezone(timedelta(0, 0)))
+            time = datetime.fromtimestamp(probe["timestamp"],
+                                          tz=timezone(timedelta(0, 0)))
+            idx = datetime(year=time.year,
+                           month=time.month,
+                           day=time.day,
+                           hour=time.hour,
+                           minute=time.minute - time.minute % 15,
+                           second=0,
+                           microsecond=0)
             data = (probe["prb_id"], probe["avg"])
             try:
                 time_dict[idx].append(data)
