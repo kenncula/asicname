@@ -1,6 +1,7 @@
 import json
 import tzdata
 from datetime import datetime, timedelta, timezone
+
 def json_to_graph(j):
     """
     json : a list of dictionaries
@@ -45,4 +46,4 @@ def json_to_graph(j):
           probe_dict[idx].append(data)
         except:
               probe_dict[idx] = [data]
-    return probe_dict.items()
+    return probe_dict

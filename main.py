@@ -1,22 +1,14 @@
 import requests
 from plot_ping import generate_plots
-from datetime import datetime, tzinfo,timedelta
-import random
 from read_json import json_to_graph
+from id_fetcher import get_starlink_probe_ids
+from fake_data import test_plots_with_fake_data
 
 prefix = 'https://atlas.ripe.net/api/v2/'
 
 msm_id = 52793844
 
-HOURS_IN_DAY = 24
-MIN_IN_HOUR = 60
-
-DAYS_OF_REQUESTS = 1
-
-MIN_BETWEEN_REQUESTS = 15
-S_BETWEEN_REQUESTS = MIN_BETWEEN_REQUESTS * 60
-MS_BETWEEN_REQUESTS = S_BETWEEN_REQUESTS * 1000
-
+FETCH_IDS = False
 TEST_GRAPHING = False
 
 def get_starlink_probe_ids():
@@ -115,18 +107,19 @@ def test_plots_with_fake_data(num_probes):
         d = [(fake_time_data[i],fake_latency_data[i]) for i in range(0, len(fake_time_data))]
         data.append(d)
     generate_plots(data)
+GENERATE_PLOT = True
 
 def main():
-    starlink_probe_ids = get_starlink_probe_ids()
-    num_starlink_probes = len(starlink_probe_ids)
-    print("Starlink Probe IDs for " + str(num_starlink_probes) + " Probes:")
-    print(starlink_probe_ids)
+    if FETCH_IDS or TEST_GRAPHING:
+        starlink_probe_ids = get_starlink_probe_ids()
+        num_starlink_probes = len(starlink_probe_ids)
     if TEST_GRAPHING:
         test_plots_with_fake_data(num_starlink_probes)
-    r = requests.get(prefix + 'measurements/'+ str(msm_id) + '/results')
-    j = r.json()
-    data = json_to_graph(j)
-    generate_plots(data)
+    if GENERATE_PLOT:
+        r = requests.get(prefix + 'measurements/'+ str(msm_id) + '/results')
+        j = r.json()
+        data = json_to_graph(j)
+        generate_plots(data)
     
 
 main()
