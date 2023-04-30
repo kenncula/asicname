@@ -1,9 +1,10 @@
 import requests
 
 starlink_ids='61537,60929,61113,60510,52955,52918,1004453,1005627,26834,1004876,1002827,1002750,35681,17979,20544'
-prefix = 'https://atlas.ripe.net/api/v2/'
+arr_starlink_ids=[61537,60929,61113,60510,52955,52918,1004453,1005627,26834,1004876,1002827,1002750,35681,17979,20544]
 start_date=datetime(2023, 5, 1, hour=0, minute=0, second=0)
 end_date=datetime(2023, 5, 2, hour=0, minute=0, second=0)
+ATLAS_API_KEY = "" #insert API_KEY_HERE
 
 
 from ripe.atlas.cousteau import Ping
@@ -29,8 +30,6 @@ from ripe.atlas.cousteau import (
   AtlasCreateRequest
 )
 
-ATLAS_API_KEY = "39916ae5-7858-40bc-b628-99755e16a8dc"
-
 atlas_request = AtlasCreateRequest(
     start_time=start_date,
     stop_time=end_date,
@@ -42,21 +41,23 @@ atlas_request = AtlasCreateRequest(
 
 import re
 (is_success, response) = atlas_request.create()
-print('measurement creation success ' + str(is_success))
+print('measurement creation success: ' + str(is_success))
 print(response)
 
 id=re.sub("[^0-9]", "", str(response))
 print("msm_id: " + id)
 
-from ripe.atlas.cousteau import AtlasLatestRequest
+from ripe.atlas.cousteau import AtlasResultsRequest
 
 kwargs = {
     "msm_id": id,
     "start": start_date,
     "stop": end_date,
-    "probe_ids": starlink_ids
+    "probe_ids": arr_starlink_ids
 }
 
-res_success, results = AtlasLatestRequest(**kwargs).create()
-
-print('result request success' + str(res_success))
+res_success, results = AtlasResultsRequest(**kwargs).create()
+if(res_success and is_success):
+    print('result request success!')
+else:
+    print('result request failure')
