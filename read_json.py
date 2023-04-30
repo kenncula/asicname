@@ -1,7 +1,7 @@
 import json
 import tzdata
 from datetime import datetime, timedelta, timezone
-def json_to_graph(path):
+def json_to_graph(j):
     """
     json : a list of dictionaries
       dict{
@@ -35,15 +35,14 @@ def json_to_graph(path):
       }
     """
     #we create a dict so we can index by probe id and consolidate data
-    with open(path) as user_file:
-      file_contents = user_file.read()
-      json_obj = json.loads(file_contents)
-      probe_dict = {}
-      for probe in json_obj:
-          idx = probe["prb_id"]
-          data = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["avg"])
-          try:
-            probe_dict[idx].append(data)
-          except:
-                probe_dict[idx] = [data]
-      return probe_dict.items()
+
+    json_obj = j
+    probe_dict = {}
+    for probe in json_obj:
+        idx = probe["prb_id"]
+        data = (datetime.fromtimestamp(probe["timestamp"], tz=timezone(timedelta(0,0))), probe["avg"])
+        try:
+          probe_dict[idx].append(data)
+        except:
+              probe_dict[idx] = [data]
+    return probe_dict.items()
