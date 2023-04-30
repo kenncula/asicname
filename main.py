@@ -1,108 +1,25 @@
-'''
-ripe.atlas.cousteau library: 
-This is a Python library provided by RIPE Atlas that provides a convenient 
-interface for working with the RIPE Atlas API. You can use it to set up and 
-execute ping measurements, and retrieve the results.
-
-MeasurementRequest() method: 
-This method allows you to create a new measurement request, which you can 
-use to define the parameters of the ping measurement you want to perform. 
-You can specify the target IP address or hostname, the number of packets 
-to send, the interval between packets, and other parameters.
-
-AtlasSource() method: 
-This method allows you to specify the source of the ping measurement. 
-You can specify a single RIPE Atlas probe, a set of probes, or a group of probes.
-
-AtlasCreateRequest() method: 
-This method allows you to create a new measurement request using the 
-parameters you have specified.
-
-AtlasResultsRequest() method: 
-This method allows you to retrieve the results of a measurement request. 
-You can use it to get the ping times for each packet, as well as other 
-information such as the number of packets lost.'''
-
-'''
-from ripe.atlas.cousteau import AtlasSource, AtlasCreateRequest, AtlasResultsRequest
-
-# Set up the measurement parameters
-ping_count = 10
-target_address = "example.com"
-
-# Set up the source of the measurement
-atlas_source = AtlasSource(type="probes", value="US")
-
-# Create the measurement request
-ping_request = AtlasCreateRequest(
-    start_time=None,
-    key=None,
-    measurements=[{
-        "type": "ping",
-        "af": 4,
-        "target": target_address,
-        "description": "Ping measurement",
-        "interval": 300,
-        "packets": ping_count,
-    }],
-    sources=[atlas_source],
-    is_oneoff=True
-)
-
-# Submit the measurement request and get the measurement ID
-ping_response = ping_request.create()
-measurement_id = ping_response["measurements"][0]
-
-# Wait for the measurement to complete
-while True:
-    is_completed = AtlasResultsRequest(msm_id=measurement_id).create().is_success()
-    if is_completed:
-        break
-
-# Get the results of the measurement
-ping_results = AtlasResultsRequest(msm_id=measurement_id).create()
-ping_times = [result["result"]["rtt"] for result in ping_results]
-
-This is chatgpt Code: DO NOT TRUST
-'''
 import requests
 
+starlink_ids='61537,60929,61113,60510,52955,52918,1004453,1005627,26834,1004876,1002827,1002750,35681,17979,20544'
 prefix = 'https://atlas.ripe.net/api/v2/'
+start_date=datetime(2023, 5, 1, hour=0, minute=0, second=0)
+end_date=datetime(2023, 5, 2, hour=0, minute=0, second=0)
 
-def get_starlink_probe_ids():
-    params = dict()
-    params['tags'] = 'starlink'
-    params['status_name'] = 'Connected'
-    params['is_public'] = True
-
-    r = requests.get(prefix + 'probes/', params=params)
-    j = r.json()
-
-    ids = []
-
-    for res in j['results']:
-        ids.append(res['id'])
-    return ids
-
-starlink_ids=get_starlink_ids()
 
 from ripe.atlas.cousteau import Ping
 from ripe.atlas.cousteau import AtlasSource
 
 ping = Ping(
     af=4,
-    target="google.com",
-    description="Ping Test",
-    #interval=900, #this sets the interval to ping every 15 minutes
-    is_oneoff=True #this is for testing,
+    target="bing.com",
+    description="Ping to bing.com every 15 min for a day",
+    interval=900 #this sets the interval to ping every 15 minutes
+    #is_oneoff=True #this is for testing,
 )
-str_ids=str(starlink_ids)
-table=str_ids.maketrans('','',' []')
-trans_ids=str_ids.translate(table)
 
 source = AtlasSource(
     type="probes",
-    value=trans_ids,
+    value=starlink_ids,
     requested=len(starlink_ids)
 )
 
@@ -112,37 +29,34 @@ from ripe.atlas.cousteau import (
   AtlasCreateRequest
 )
 
-ATLAS_API_KEY = "9b60b650-68bf-4c40-bbcc-a2b8d3e15779"
+ATLAS_API_KEY = "39916ae5-7858-40bc-b628-99755e16a8dc"
 
 atlas_request = AtlasCreateRequest(
+    start_time=start_date,
+    stop_time=end_date,
     key=ATLAS_API_KEY,
     measurements=[ping],
-    sources=[source],
-    is_oneoff=True
+    sources=[source]
+    #is_oneoff=True
 )
 
 import re
 (is_success, response) = atlas_request.create()
+print('measurement creation success ' + str(is_success))
+print(response)
+
 id=re.sub("[^0-9]", "", str(response))
-print("msm_id:" + id)
+print("msm_id: " + id)
 
 from ripe.atlas.cousteau import AtlasLatestRequest
 
 kwargs = {
     "msm_id": id,
-    "probe_ids": trans_ids
+    "start": start_date,
+    "stop": end_date,
+    "probe_ids": starlink_ids
 }
 
 res_success, results = AtlasLatestRequest(**kwargs).create()
 
-if res_success:
-    print(results)
-
-def main():
-    starlink__probe_ids = get_starlink_probe_ids()
-    num_starlink_probes = len(starlink__probe_ids)
-
-    print(str(num_starlink_probes) + " Probes \nProbe IDs:")
-    print(starlink__probe_ids)
-
-main()
+print('result request success' + str(res_success))
