@@ -13,7 +13,7 @@ msm_id = 52793844
 FETCH_IDS = False
 PING_GOOGLE = False
 TEST_GRAPHING = False
-GENERATE_PLOT = True
+GENERATE_PLOT = False
 
 
 
