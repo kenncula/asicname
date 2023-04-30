@@ -123,7 +123,7 @@ def main():
     print(starlink_probe_ids)
     if TEST_GRAPHING:
         test_plots_with_fake_data(num_starlink_probes)
-    r = requests.get(prefix + 'measurements/'+ msm_id + '/results')
+    r = requests.get(prefix + 'measurements/'+ str(msm_id) + '/results')
     j = r.json()
     data = json_to_graph(j)
     generate_plots(data)

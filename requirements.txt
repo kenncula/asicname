@@ -4,3 +4,4 @@ numpy
 datetime
 plotly
 pandas
+dash-bootstrap-components
