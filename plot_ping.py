@@ -80,36 +80,32 @@ def geo_plot(data, geo_lookup, animate=True):
                                 lat=df['lat'],
                                 lon=df['lon'],
                                 color=df['latency'],
-                                range_color=[0, 300],
-                                animation_group="probe",
-                                animation_frame="time")
+                                range_color=[0, 200],
+                                animation_group="time",
+                                animation_frame="time",
+                                color_continuous_scale='Portland',
+                                zoom=0)
         fig.update_layout(mapbox_style="carto-darkmatter",
-                          mapbox_zoom=10,
                           mapbox_center_lon=180)
         fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
-        fig.layout.updatemenus[0].buttons[0].args[1]["frame"]["duration"] = 600
+        fig.layout.updatemenus[0].buttons[0].args[1]["frame"]["duration"] = 100
         fig.layout.updatemenus[0].buttons[0].args[1]["transition"][
-            "duration"] = 600
+            "duration"] = 100
         fig.layout.coloraxis.showscale = True
         fig.layout.sliders[0].pad.t = 10
         fig.layout.updatemenus[0].pad.t = 10
     else:
-        fig = px.density_mapbox(df,
+        fig = px.scatter_mapbox(df,
                                 hover_name=df['probe'],
                                 lat=df['lat'],
                                 lon=df['lon'],
-                                z=df['latency'],
-                                radius=10,
-                                animation_group="probe",
-                                animation_frame="time")
-        fig.update_layout(
-            mapbox_style="carto-positron",
-            mapbox_zoom=10,
-            mapbox_center={
-                "lat": 40.7831,
-                "lon": -73.9712
-            },
-        )
-
-    fig.show()
+                                color=df['latency'],
+                                range_color=[0, 175],
+                                color_continuous_scale='Portland',
+                                zoom=0)
+        fig.update_layout(mapbox_style="carto-darkmatter",
+                          mapbox_center_lon=180)
+        fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+    config = dict({'scrollZoom': True})
+    fig.show(config=config)
