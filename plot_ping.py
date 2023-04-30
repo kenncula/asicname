@@ -17,7 +17,7 @@ def generate_plots(data):
   fig.update_layout(
     title="Latency Over Time of RIPE Atlas Probes",
     xaxis_title="Time (UTC)",
-    yaxis_title="Latency",
+    yaxis_title="Latency (ms)",
     font=dict(
       family="Courier New, monospace",
       size=18,
