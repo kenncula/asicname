@@ -1,55 +1,67 @@
+'''
+Running this file creates ping measurements and affirms that they were successful
+'''
+
+import requests
+
+starlink_ids='61537,60929,61113,60510,52955,52918,1004453,1005627,26834,1004876,1002750,35681,17979,20544'
+arr_starlink_ids=[61537,60929,61113,60510,52955,52918,1004453,1005627,26834,1004876,1002750,35681,17979,20544]
+start_date=datetime(2023, 5, 1, hour=0, minute=0, second=0)
+end_date=datetime(2023, 5, 2, hour=0, minute=0, second=0)
+ATLAS_API_KEY = "" #insert API_KEY_HERE
+
+
 from ripe.atlas.cousteau import Ping
 from ripe.atlas.cousteau import AtlasSource
+
+ping = Ping(
+    af=4,
+    target="bing.com",
+    description="Ping to bing.com every 15 min for a day",
+    interval=900 #this sets the interval to ping every 15 minutes
+    #is_oneoff=True #this is for testing,
+)
+
+source = AtlasSource(
+    type="probes",
+    value=starlink_ids,
+    requested=len(starlink_ids)
+)
+
 from datetime import datetime
 from ripe.atlas.cousteau import (
   AtlasSource,
   AtlasCreateRequest
 )
-from ripe.atlas.cousteau import AtlasLatestRequest
+
+atlas_request = AtlasCreateRequest(
+    start_time=start_date,
+    stop_time=end_date,
+    key=ATLAS_API_KEY,
+    measurements=[ping],
+    sources=[source]
+    #is_oneoff=True
+)
+
 import re
-import json
+(is_success, response) = atlas_request.create()
+print('measurement creation success: ' + str(is_success))
+print(response)
 
-f = open('client_secret.json')
-j = json.load(f)
-ATLAS_API_KEY = j["Google_Ping_API_KEY"]
+id=re.sub("[^0-9]", "", str(response))
+print("msm_id: " + id)
 
-def ping_google(ids):
-    starlink_ids = ids
-    ping = Ping(
-      af=4,
-      target="google.com",
-      description="Ping Test",
-      #interval=900, #this sets the interval to ping every 15 minutes
-      is_oneoff=True #this is for testing,
-    )
-    str_ids=str(starlink_ids)
-    table=str_ids.maketrans('','',' []')
-    trans_ids=str_ids.translate(table)
+from ripe.atlas.cousteau import AtlasResultsRequest
 
-    source = AtlasSource(
-        type="probes",
-        value=trans_ids,
-        requested=len(starlink_ids)
-    )
+kwargs = {
+    "msm_id": id,
+    "start": start_date,
+    "stop": end_date,
+    "probe_ids": arr_starlink_ids
+}
 
-    atlas_request = AtlasCreateRequest(
-        key=ATLAS_API_KEY,
-        measurements=[ping],
-        sources=[source],
-        is_oneoff=True
-    )
-
-
-    (is_success, response) = atlas_request.create()
-    id=re.sub("[^0-9]", "", str(response))
-    print("msm_id:" + id)
-
-    kwargs = {
-        "msm_id": id,
-        "probe_ids": trans_ids
-    }
-
-    res_success, results = AtlasLatestRequest(**kwargs).create()
-
-    if res_success:
-        print(results)
+res_success, results = AtlasResultsRequest(**kwargs).create()
+if(res_success and is_success):
+    print('result request success!')
+else:
+    print('result request failure')
