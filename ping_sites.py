@@ -7,8 +7,11 @@ from ripe.atlas.cousteau import (
 )
 from ripe.atlas.cousteau import AtlasLatestRequest
 import re
+import json
 
-ATLAS_API_KEY = "9b60b650-68bf-4c40-bbcc-a2b8d3e15779"
+f = open('client_secret.json')
+j = json.load(f)
+ATLAS_API_KEY = j["Google_Ping_API_KEY"]
 
 def ping_google(ids):
     starlink_ids = ids
