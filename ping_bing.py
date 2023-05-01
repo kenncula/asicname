@@ -3,12 +3,13 @@ Running this file creates ping measurements and affirms that they were successfu
 '''
 
 import requests
+from datetime import datetime
 
-starlink_ids='61537,60929,61113,60510,52955,52918,1004453,1005627,26834,1004876,1002750,35681,17979,20544'
-arr_starlink_ids=[61537,60929,61113,60510,52955,52918,1004453,1005627,26834,1004876,1002750,35681,17979,20544]
-start_date=datetime(2023, 5, 1, hour=0, minute=0, second=0)
-end_date=datetime(2023, 5, 2, hour=0, minute=0, second=0)
-ATLAS_API_KEY = "" #insert API_KEY_HERE
+starlink_ids='61537,60929,61113,60510,52955,52918,1004453,1005627,26834,1004876,1002750,35681,17979,20544,61241'
+arr_starlink_ids=[61537,60929,61113,60510,52955,52918,1004453,1005627,26834,1004876,1002750,35681,17979,20544,61241]
+start_date=datetime(2023, 5, 2, hour=0, minute=0, second=0)
+end_date=datetime(2023, 5, 3, hour=0, minute=0, second=0)
+ATLAS_API_KEY = "6663e2dc-055b-426e-971c-caec6d00d6ee" #insert API_KEY_HERE
 
 
 from ripe.atlas.cousteau import Ping
